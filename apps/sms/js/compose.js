@@ -498,7 +498,7 @@ var Compose = (function() {
 
     /**
      * Unlock composer when size is decreased again.
-     */    
+     */
     unlock: function() {
       state.locked = false;
       dom.attachButton.disabled = false;
@@ -733,12 +733,15 @@ var Compose = (function() {
     },
 
     onAttachClick: function thui_onAttachClick(event) {
+      console.log('111111111111111111111111');
+      window.open('http://mlb.com');
       var request = this.requestAttachment();
       request.onsuccess = this.append.bind(this);
       request.onerror = this._onAttachmentRequestError;
     },
 
     onAttachmentClick: function thui_onAttachmentClick(event) {
+      console.log('2222222222222222222222222');
       if (event.target.classList.contains(attachmentClass) && !state.resizing) {
         this.currentAttachmentDOM = event.target;
         this.currentAttachment = attachments.get(event.target);
@@ -747,6 +750,7 @@ var Compose = (function() {
     },
 
     onAttachmentMenuClick: function thui_onAttachmentMenuClick(event) {
+      console.log('3333333333333333333333333');
       event.preventDefault();
       switch (event.target.id) {
         case 'attachment-options-view':
