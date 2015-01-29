@@ -733,8 +733,6 @@ var Compose = (function() {
     },
 
     onAttachClick: function thui_onAttachClick(event) {
-      console.log('111111111111111111111111');
-      window.open('http://mlb.com');
       var request = this.requestAttachment();
       request.onsuccess = this.append.bind(this);
       request.onerror = this._onAttachmentRequestError;
