@@ -12,6 +12,13 @@ function debug(str) {
   dump(' -*- System-Remote.js: ' + str + '\n');
 }
 
+function receiveMessage(event) {
+  debug("event.source: " + event.source);
+  debug("event.data: " + event.data);
+  debug("event.origin: " + event.origin);
+
+}
+
 var systemRemote = {
 
   get contentURL() {
@@ -33,15 +40,24 @@ var systemRemote = {
     debug("---- Starting system remote! ----");
     this._started = true;
 
+    // ------------
+    // Supposedly the following implementation should move to 'reveiveMessage'.
     var contentURL = this.contentURL;
     var manifestURL = this.manifestURL;
-    var contentApp = document.getElementById('content');
 
-    contentApp.src = contentURL;
+    var remoteAppFrame = document.createElement('iframe');
+    remoteAppFrame.setAttribute('id', 'remoteapp');
+    remoteAppFrame.setAttribute('mozbrowser', 'true');
     if (manifestURL) {
-      contentApp.mozApp = manifestURL;
+      remoteAppFrame.setAttribute('mozapp', manifestURL);
     }
-
+    remoteAppFrame.setAttribute('allowfullscreen', 'true');
+    remoteAppFrame.setAttribute('style', "overflow: hidden; height: 100%; width: 100%; border: none; position: absolute; left: 0; top: 0; right: 0; bottom: 0; max-height: 100%;");
+    remoteAppFrame.setAttribute('src', "data:text/html;charset=utf-8,%3C!DOCTYPE html>%3Cbody style='background:black;");
+    var container = document.getElementById('container');
+    this.contentBrowser = container.appendChild(remoteAppFrame);
+    this.contentBrowser.src = contentURL;
+    // ------------
   },
 
   stop: function shellRemote_stop() {
@@ -50,9 +66,10 @@ var systemRemote = {
 
 };
 
+window.addEventListener("message", receiveMessage, false);
+
 window.onload = function() {
   if (systemRemote.hasStarted() == false) {
-    debug("Ready to start system remote....");
     systemRemote.start();
   }
 };
