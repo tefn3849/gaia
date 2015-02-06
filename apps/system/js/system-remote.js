@@ -16,12 +16,20 @@
 
       this.bc = new window.BroadcastChannel('multiscreen');
       this.bc.addEventListener('message', this);
+      this.bc.postMessage('remote-system-started');
     },
 
     handleEvent: function(evt) {
-      console.log('broadcast:' + evt);
-      var contentURL = evt.url;
-      var manifestURL = evt.manifestURL;
+      var contentURL = evt.data.url;
+      var manifestURL = evt.data.manifestURL;
+
+      if (this.contentBrowser) {
+        this.contentBrowser.src = contentURL;
+        if (manifestURL) {
+          this.contentBrowser.setAttribute('mozapp', manifestURL);
+        }
+        return;
+      }
 
       var remoteAppFrame = document.createElement('iframe');
       remoteAppFrame.setAttribute('id', 'remoteapp');
