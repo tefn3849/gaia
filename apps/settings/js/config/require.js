@@ -259,14 +259,6 @@ require.config({
       exclude: ['main']
     },
     {
-      name: 'panels/wifip2p/panel',
-      exclude: ['main']
-    },
-    {
-      name: 'panels/wifip2p_wps/panel',
-      exclude: ['main']
-    },
-    {
       name: 'panels/date_time/panel',
       exclude: [
         'main',
