@@ -246,6 +246,7 @@
       var inEditMode = this.dragdrop && this.dragdrop.inEditMode;
 
       var action = 'launch';
+      var remoteId = 0;
       if (e.target.classList.contains('remove')) {
         action = 'remove';
       }
@@ -259,9 +260,10 @@
         if (inEditMode && e.target.classList.contains('icon')) {
           // Check if we're trying to edit a bookmark or collection
           if (!icon.isEditable()) {
-            return;
+            remoteId = 1;
+          } else {
+            action = 'edit';
           }
-          action = 'edit';
         } else {
           // If the icon can't be launched, bail out early
           if (!icon[action]) {
@@ -302,7 +304,7 @@
         }.bind(this), APP_LAUNCH_TIMEOUT);
       }
 
-      icon[action](e.target);
+      icon[action](e.target, remoteId);
     },
 
     /**

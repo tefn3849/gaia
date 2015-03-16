@@ -292,7 +292,7 @@
     /**
      * Resolves click action.
      */
-    launch: function() {
+    launch: function(target, remoteId) {
       var app = this.app;
 
       switch (this._determineState(app)) {
@@ -309,12 +309,15 @@
         window.performance.mark('appLaunch@' + app.manifest.name);
       }
 
+      var launchRemote = app.launchRemote ? app.launchRemote.bind(app, remoteId)
+                                          : app.launch.bind(app);
+
       if (this.entryPoint) {
-        return app.launch(this.entryPoint);
+        return launchRemote(this.entryPoint);
       }
 
       // Default action is to launch the app.
-      return app.launch();
+      return launchRemote();
     }
   };
 

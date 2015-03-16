@@ -44,6 +44,7 @@
         return;
       }
       this._started = true;
+      this.bc = new BroadcastChannel('multiscreen');
 
       window.addEventListener('webapps-launch', this.preHandleEvent);
       window.addEventListener('webapps-close', this.preHandleEvent);
@@ -166,6 +167,19 @@
      * @memberof AppWindowFactory.prototype
      */
     launch: function awf_launch(config) {
+      dump('AppWindowFactory::launch: ' + config.remoteId);
+
+      if (config.remoteId) {
+        dump('AppWindowFactory: ' + config.url + ', ' + config.manifestURL);
+
+        this.bc.postMessage({
+          url: config.url,
+          manifestURL: config.manifestURL
+        });
+
+        return;
+      }
+
       if (config.url === window.location.href) {
         return;
       }
