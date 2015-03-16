@@ -24,6 +24,7 @@
     this.instanceID = _id++;
     this._injected = false;
     this.app.element.addEventListener('mozbrowsercontextmenu', this);
+    this.bc = new BroadcastChannel('multiscreen');
     return this;
   };
 
@@ -264,6 +265,13 @@
     newTabApp.launch();
   };
 
+  BrowserContextMenu.prototype.newRemoteWindow = function(url) {
+    this.bc.postMessage({
+      url: url,
+      manifestURL: null
+    });
+  };
+
   BrowserContextMenu.prototype.showWindows = function(manifest) {
     window.dispatchEvent(
       new CustomEvent('taskmanagershow',
@@ -335,6 +343,12 @@
     return new Promise((resolve) => {
       var config = this.app.config;
       var menuData = [];
+
+      menuData.push({
+        id: 'new-remote-window',
+        label: 'New remote window',
+        callback: this.newRemoteWindow.bind(this, config.url)
+      });
 
       menuData.push({
         id: 'new-window',

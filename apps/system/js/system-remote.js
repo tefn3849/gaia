@@ -20,19 +20,35 @@
     },
 
     handleEvent: function(evt) {
+      var container = document.getElementById('container');
       var contentURL = evt.data.url;
       var manifestURL = evt.data.manifestURL;
 
       if (this.contentBrowser) {
-        this.contentBrowser.src = contentURL;
-        if (manifestURL) {
-          this.contentBrowser.setAttribute('mozapp', manifestURL);
-        }
+        var frameToRemove = this.contentBrowser;
+        var remoteAppFrame = this.createAppFrame(contentURL, manifestURL);
+        this.contentBrowser = container.appendChild(remoteAppFrame);
+
+        // Remove the previous app until the new frame is loaded to
+        // avoid blinking.
+        var self = this;
+        this.contentBrowser.addEventListener('mozbrowserloadend',
+                                             function onloadend() {
+          container.removeChild(frameToRemove);
+          self.contentBrowserremoveEventListener(onloadend);
+        });
+
         return;
       }
 
+      var remoteAppFrame = this.createAppFrame(contentURL, manifestURL);
+      this.contentBrowser = container.appendChild(remoteAppFrame);
+    },
+
+    createAppFrame: function(url, manifestURL) {
       var remoteAppFrame = document.createElement('iframe');
       remoteAppFrame.setAttribute('id', 'remoteapp');
+      remoteAppFrame.setAttribute('remote', 'true');
       remoteAppFrame.setAttribute('mozbrowser', 'true');
       if (manifestURL) {
         remoteAppFrame.setAttribute('mozapp', manifestURL);
@@ -42,9 +58,8 @@
         'overflow: hidden; height: 100%; width: 100%; border: none; ' +
         'position: absolute; left: 0; top: 0; right: 0; bottom: 0; ' +
         'max-height: 100%;');
-      var container = document.getElementById('container');
-      this.contentBrowser = container.appendChild(remoteAppFrame);
-      this.contentBrowser.src = contentURL;
+      remoteAppFrame.src = url;
+      return remoteAppFrame;
     },
 
     stop: function shellRemote_stop() {
