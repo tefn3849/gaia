@@ -38,10 +38,19 @@
       this.createActivityWindow.bind(this));
     this.app.element.addEventListener('_launchtrusted',
       this.createTrustedWindow.bind(this));
+    this.bc = new BroadcastChannel('multiscreen');
   };
 
   ChildWindowFactory.prototype.handleEvent =
     function cwf_handleEvent(evt) {
+      if (evt.detail.features.contains('remoteId=')) {
+        this.bc.postMessage({
+          url: evt.detail.url,
+          manifestURL: null
+        });
+        return;
+      }
+
       // Handle event from child window.
       if (evt.detail && evt.detail.instanceID &&
           evt.detail.instanceID !== this.app.instanceID) {

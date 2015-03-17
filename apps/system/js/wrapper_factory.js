@@ -10,6 +10,7 @@
   var WrapperFactory = {
     init: function wf_init() {
       window.addEventListener('mozbrowseropenwindow', this, true);
+      this.bc = new BroadcastChannel('multiscreen');
     },
 
     handleEvent: function wf_handleEvent(evt) {
@@ -17,6 +18,14 @@
 
       // If it's a normal window.open request, ignore.
       if (typeof detail.features !== 'string') {
+        return;
+      }
+
+      if (evt.detail.features.contains('remoteId=')) {
+        this.bc.postMessage({
+          url: evt.detail.url,
+          manifestURL: null
+        });
         return;
       }
 

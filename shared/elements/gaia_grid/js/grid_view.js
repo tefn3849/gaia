@@ -259,11 +259,13 @@
         // We do not allow users to launch icons in edit mode
         if (inEditMode && e.target.classList.contains('icon')) {
           // Check if we're trying to edit a bookmark or collection
+          /*
           if (!icon.isEditable()) {
-            remoteId = 1;
-          } else {
-            action = 'edit';
+            return;
           }
+          action = 'edit';
+          */
+          remoteId = 1;
         } else {
           // If the icon can't be launched, bail out early
           if (!icon[action]) {
