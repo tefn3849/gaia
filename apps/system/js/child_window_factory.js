@@ -43,10 +43,13 @@
 
   ChildWindowFactory.prototype.handleEvent =
     function cwf_handleEvent(evt) {
+      dump('ChildWindowFactory:mozbrowseropenwindow ' + JSON.stringify(evt.detail) + ',' +
+           'manifestURL: ' + this.app.manifestURL);
+
       if (evt.detail.features.contains('remoteId=')) {
         this.bc.postMessage({
           url: evt.detail.url,
-          manifestURL: null
+          manifestURL: this.app.manifestURL
         });
         return;
       }

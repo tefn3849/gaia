@@ -35,7 +35,7 @@
         this.contentBrowser.addEventListener('mozbrowserloadend',
                                              function onloadend() {
           container.removeChild(frameToRemove);
-          self.contentBrowserremoveEventListener(onloadend);
+          self.contentBrowser.removeEventListener('mozbrowserloadend', onloadend);
         });
 
         return;

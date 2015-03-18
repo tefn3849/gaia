@@ -787,11 +787,20 @@ function thumbnailClickHandler(evt) {
   } else {
     LazyLoader.load('js/frame_scripts.js', function() {
       if (isPortrait || isPhone) {
-        setView(LAYOUT_MODE.fullscreen);
+        //setView(LAYOUT_MODE.fullscreen);
       }
-      showFile(index);
+      showFileRemote(index);
     });
   }
+}
+
+function showFileRemote(index) {
+  var presentUrl = 'present.html';
+  var fileinfo = files[index];
+  var hash = [fileinfo.name, fileinfo.metadata.width, fileinfo.metadata.height].join(',') ;
+
+  window.open('present.html#' + encodeURIComponent(hash), '_blank', 'remoteId=1');
+  return;
 }
 
 // On large screen, we outline the picture we're focusing on and
