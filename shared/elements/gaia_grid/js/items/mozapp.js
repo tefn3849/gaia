@@ -295,6 +295,8 @@
     launch: function(target, remoteId) {
       var app = this.app;
 
+      dump('Mozapp: ' + JSON.stringify(app.origin) + ', ' + this.entryPoint);
+
       switch (this._determineState(app)) {
         case APP_UNRECOVERABLE:
           return this.unrecoverableError();
@@ -309,15 +311,25 @@
         window.performance.mark('appLaunch@' + app.manifest.name);
       }
 
-      var launchRemote = app.launchRemote ? app.launchRemote.bind(app, remoteId)
-                                          : app.launch.bind(app);
+      // If comes with remoteId, use window.open to open in the remote window.
+      // instead of using app.launch.
+      if (remoteId) {
+        var features = ['remoteId=' + remoteId, 'manifestURL=' + app.manifestURL].join(',');
+        var appUrl = app.origin + '/';     // app://xxx.gaiamobile.com/
+        if (this.entryPoint) {
+          appUrl += this.entryPoint + '/'; // app://xxx.gaiamobile.com/entry/
+        }
+        appUrl += 'index.html';
+        window.open(appUrl, '_blank', features);
+        return;
+      }
 
       if (this.entryPoint) {
-        return launchRemote(this.entryPoint);
+        return app.launch(this.entryPoint);
       }
 
       // Default action is to launch the app.
-      return launchRemote();
+      return app.launch();
     }
   };
 

@@ -5,7 +5,7 @@
   var MultiScreenController = function() {};
   MultiScreenController.EVENTS = [
     'message',
-    'volumedown'
+    //'volumedown'
   ];
   BaseModule.create(MultiScreenController, {
     name: 'MultiScreenController',

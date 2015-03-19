@@ -171,8 +171,20 @@
 
       if (config.remoteId) {
         dump('AppWindowFactory: ' + config.url + ', ' + config.manifestURL);
+        
+        // Call from app.launch(). (Not used now.... Replaced by window.open in mozapp.js)
+        var displayId = RegExp('remoteId=([0-9]*)').exec(evt.detail.features)[1];
+        if (displayId) {
+          this.app.configOverride = {
+            url: evt.detail.url,
+            manifestURL: this.app.manifestURL
+          };
+          this.app.showDefaultContextMenu();
+          return;
+        }
 
         this.bc.postMessage({
+          displayId: config.remoteId,
           url: config.url,
           manifestURL: config.manifestURL
         });

@@ -265,10 +265,13 @@
     newTabApp.launch();
   };
 
-  BrowserContextMenu.prototype.newRemoteWindow = function(url) {
+  BrowserContextMenu.prototype.newRemoteWindow = function(url, manifestURL, displayId) {
+    dump('BrowserContextMenu: ' + url + manifestURL + displayId);
+
     this.bc.postMessage({
+      displayId: displayId,
       url: url,
-      manifestURL: null
+      manifestURL: manifestURL
     });
   };
 
@@ -344,10 +347,20 @@
       var config = this.app.config;
       var menuData = [];
 
+      if (this.app.configOverride) {
+        config = this.app.configOverride;
+      }
+
       menuData.push({
-        id: 'new-remote-window',
-        label: 'New remote window',
-        callback: this.newRemoteWindow.bind(this, config.url)
+        id: 'new-remote-window-hdmi',
+        label: 'New window (HDMI)',
+        callback: this.newRemoteWindow.bind(this, config.url, config.manifestURL, '1')
+      });
+
+      menuData.push({
+        id: 'new-remote-window-virtual',
+        label: 'New window (Wifi Display)',
+        callback: this.newRemoteWindow.bind(this, config.url, config.manifestURL, '2')
       });
 
       menuData.push({

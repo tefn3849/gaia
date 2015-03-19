@@ -17,10 +17,27 @@
       this.bc = new window.BroadcastChannel('multiscreen');
       this.bc.addEventListener('message', this);
       this.bc.postMessage('remote-system-started');
+
+      this.displayId = window.location.hash ? window.location.hash.substring(1)
+                                            : undefined;
     },
 
     handleEvent: function(evt) {
       var container = document.getElementById('container');
+
+      if (typeof evt.data !== 'object') {
+        return;
+      }
+
+      debug('this.displayId: ' + JSON.stringify(this.displayId));
+      debug('evt.data: ' + JSON.stringify(evt.data));
+
+      if ('displayId' in evt.data &&
+          this.displayId !== (evt.data.displayId + '')) {
+        debug('This event is for ' + evt.data.displayId + ' but I am '+ this.displayId);
+        return;
+      }
+
       var contentURL = evt.data.url;
       var manifestURL = evt.data.manifestURL;
 
@@ -35,6 +52,7 @@
         this.contentBrowser.addEventListener('mozbrowserloadend',
                                              function onloadend() {
           container.removeChild(frameToRemove);
+          frameToRemove = null; // Hope this would help clean the garbage faster.
           self.contentBrowser.removeEventListener('mozbrowserloadend', onloadend);
         });
 
