@@ -15,6 +15,8 @@
       this._started = true;
 
       this.cursor = document.getElementById('cursor');
+      this.cursorX = this.centerX = screen.width / 2;
+      this.cursorY = this.centerY = screen.height / 2;
       this.logger = document.getElementById('log');
       this.logger2 = document.getElementById('log2');
 
@@ -38,6 +40,10 @@
       this._handle_touch(data);
     },
 
+    _handle_volumedown: function() {
+
+    },
+
     _handle_touch: function(data) {
       var touch = data.touch;
       var ox = touch.pageX;
@@ -48,12 +54,9 @@
       var nh = screen.height;
       var nx = nw*ox/ow;
       var ny = nh*oy/oh;
-      this.logger2.innerHTML = 'x='+nx+',y='+ny;
-      this.contentBrowser &&
-      this.contentBrowser.sendTouchEvent(data.type, [touch.identifier],
-                                    [ox], [oy],
-                                    [touch.radiusX], [touch.radiusY],
-                                    [touch.rotationAngle], [touch.force], 1, 0);
+      if (this.DEBUG) {
+        this.logger2.innerHTML = 'x='+nx+',y='+ny;
+      }
       switch (data.type) {
         case 'touchstart':
           this._startX = nx;
@@ -62,11 +65,22 @@
         case 'touchmove':
           this.updateCursor(nx - this._startX, ny - this._startY);
           break;
+        case 'touchend':
+          this.cursorX = this.cursorX + nx - this._startX;
+          this.cursorY = this.cursorY + ny - this._startY;
+          break;
       }
+      this.contentBrowser &&
+      this.contentBrowser.sendTouchEvent(data.type, [touch.identifier],
+                                    [this.cursorX], [this.cursorY],
+                                    [touch.radiusX], [touch.radiusY],
+                                    [touch.rotationAngle], [touch.force], 1, 0);
     },
 
     updateCursor: function(x, y) {
       this.showCursor();
+      x = this.cursorX - this.centerX + x;
+      y = this.cursorY - this.centerY + y;
       this.cursor.style.MozTransform = 'translateX(' + x + 'px) translateY(' + y + 'px)';
     },
 
@@ -82,7 +96,9 @@
       }
 
       if ('type' in evt.data) {
-        this.logger.innerHTML = JSON.stringify(evt.data);
+        if (this.DEBUG) {
+          this.logger.innerHTML = JSON.stringify(evt.data);
+        }
         this['_handle_' + evt.data.type](evt.data);
         return;
       }
