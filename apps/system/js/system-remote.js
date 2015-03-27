@@ -54,12 +54,20 @@
                                     [ox], [oy],
                                     [touch.radiusX], [touch.radiusY],
                                     [touch.rotationAngle], [touch.force], 1, 0);
-      this.updateCursor(nx, ny);
+      switch (data.type) {
+        case 'touchstart':
+          this._startX = nx;
+          this._startY = ny;
+          break;
+        case 'touchmove':
+          this.updateCursor(nx - this._startX, ny - this._startY);
+          break;
+      }
     },
 
     updateCursor: function(x, y) {
       this.showCursor();
-      this.cursor.style.transform = 'translateX(' + x + ') translateY(' + y + ')';
+      this.cursor.style.MozTransform = 'translateX(' + x + 'px) translateY(' + y + 'px)';
     },
 
     showCursor: function() {
