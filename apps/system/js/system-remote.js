@@ -14,6 +14,10 @@
       debug('---- Starting system remote! ----');
       this._started = true;
 
+      this.cursor = document.getElementById('cursor');
+      this.logger = document.getElementById('log');
+      this.logger2 = document.getElementById('log2');
+
       this.bc = new window.BroadcastChannel('multiscreen');
       this.bc.addEventListener('message', this);
       this.bc.postMessage('remote-system-started');
@@ -22,10 +26,56 @@
                                             : undefined;
     },
 
+    _handle_touchstart: function(data) {
+      this._handle_touch(data);
+    },
+
+    _handle_touchmove: function(data) {
+      this._handle_touch(data);
+    },
+
+    _handle_touchend: function(data) {
+      this._handle_touch(data);
+    },
+
+    _handle_touch: function(data) {
+      var touch = data.touch;
+      var ox = touch.pageX;
+      var oy = touch.pageY;
+      var ow = touch.width;
+      var oh = touch.height;
+      var nw = screen.width;
+      var nh = screen.height;
+      var nx = nw*ox/ow;
+      var ny = nh*oy/oh;
+      this.logger2.innerHTML = 'x='+nx+',y='+ny;
+      this.contentBrowser &&
+      this.contentBrowser.sendTouchEvent(data.type, [touch.identifier],
+                                    [ox], [oy],
+                                    [touch.radiusX], [touch.radiusY],
+                                    [touch.rotationAngle], [touch.force], 1, 0);
+      this.updateCursor(nx, ny);
+    },
+
+    updateCursor: function(x, y) {
+      this.showCursor();
+      this.cursor.style.transform = 'translateX(' + x + ') translateY(' + y + ')';
+    },
+
+    showCursor: function() {
+      this.cursor.classList.add('visible');
+    },
+
     handleEvent: function(evt) {
       var container = document.getElementById('container');
 
       if (typeof evt.data !== 'object') {
+        return;
+      }
+
+      if ('type' in evt.data) {
+        this.logger.innerHTML = JSON.stringify(evt.data);
+        this['_handle_' + evt.data.type](evt.data);
         return;
       }
 
