@@ -10,13 +10,22 @@
       return this._started;
     },
 
+    // The window.screen.width and window.screen.height is not reliable yet.
+    // Use this object to get the actual screen width and height.
+    screen: {},
+
     start: function systemRemote_start() {
       debug('---- Starting system remote! ----');
       this._started = true;
 
       this.cursor = document.getElementById('cursor');
-      this.cursorX = this.centerX = screen.width / 2;
-      this.cursorY = this.centerY = screen.height / 2;
+
+      this.screen.width = this.cursor.offsetLeft * 2;
+      this.screen.height = this.cursor.offsetTop * 2;
+
+      this.cursorX = this.centerX = this.screen.width / 2;
+      this.cursorY = this.centerY = this.screen.height / 2;
+
       this.logger = document.getElementById('log');
       this.logger2 = document.getElementById('log2');
 
@@ -26,6 +35,8 @@
 
       this.displayId = window.location.hash ? window.location.hash.substring(1)
                                             : undefined;
+
+      this.cursor.style.display = 'none';
     },
 
     _handle_touchstart: function(data) {
@@ -50,8 +61,8 @@
       var oy = touch.pageY;
       var ow = touch.width;
       var oh = touch.height;
-      var nw = screen.width;
-      var nh = screen.height;
+      var nw = this.screen.width;
+      var nh = this.screen.height;
       var nx = nw*ox/ow;
       var ny = nh*oy/oh;
       if (this.DEBUG) {
@@ -61,6 +72,7 @@
         case 'touchstart':
           this._startX = nx;
           this._startY = ny;
+          this._StartTime = Date.now();
           break;
         case 'touchmove':
           this.updateCursor(nx - this._startX, ny - this._startY);
@@ -70,11 +82,25 @@
           this.cursorY = this.cursorY + ny - this._startY;
           break;
       }
-      this.contentBrowser &&
-      this.contentBrowser.sendTouchEvent(data.type, [touch.identifier],
-                                    [this.cursorX], [this.cursorY],
-                                    [touch.radiusX], [touch.radiusY],
-                                    [touch.rotationAngle], [touch.force], 1, 0);
+
+      function dist(x0, y0, x1, y1) {
+        var dx = x0 - x1;
+        var dy = y0 - y1;
+        return Math.sqrt(dx * dx + dy * dy);
+      }
+
+      var CLICK_DISTANCE_THRESHOLD = 25;
+      var CLICK_TIME_THRESHOLD_MS = 500;
+
+      if (data.type === 'touchend' &&
+          dist(this._startX, this._startY, nx, ny) < CLICK_DISTANCE_THRESHOLD &&
+          Date.now() - this._StartTime < CLICK_TIME_THRESHOLD_MS) {
+        if (this.contentBrowser) {
+          this.contentBrowser.sendMouseEvent('mousedown', this.cursorX, this.cursorY, 0, 1, 0);
+          this.contentBrowser.sendMouseEvent('mouseup', this.cursorX, this.cursorY, 0, 1, 0);
+        }
+      }
+
     },
 
     updateCursor: function(x, y) {
@@ -85,6 +111,7 @@
     },
 
     showCursor: function() {
+      this.cursor.style.display = 'inline-block';
       this.cursor.classList.add('visible');
     },
 
