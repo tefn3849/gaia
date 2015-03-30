@@ -37,6 +37,10 @@
                                             : undefined;
 
       this.cursor.style.display = 'none';
+
+      var remoteAppFrame = this.createAppFrame('about:blank', null);
+      this.contentBrowser = container.appendChild(remoteAppFrame);
+      this.contentBrowser.style.visibility = 'hidden';
     },
 
     _handle_touchstart: function(data) {
@@ -89,7 +93,7 @@
         return Math.sqrt(dx * dx + dy * dy);
       }
 
-      var CLICK_DISTANCE_THRESHOLD = 25;
+      var CLICK_DISTANCE_THRESHOLD = 15;
       var CLICK_TIME_THRESHOLD_MS = 500;
 
       if (data.type === 'touchend' &&
@@ -159,9 +163,6 @@
 
         return;
       }
-
-      var remoteAppFrame = this.createAppFrame(contentURL, manifestURL);
-      this.contentBrowser = container.appendChild(remoteAppFrame);
     },
 
     createAppFrame: function(url, manifestURL) {
