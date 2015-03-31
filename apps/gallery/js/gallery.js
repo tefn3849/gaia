@@ -789,6 +789,7 @@ function thumbnailClickHandler(evt) {
       if (isPortrait || isPhone) {
         showFileRemote(index);
       } else {
+        showFile(index);
         setView(LAYOUT_MODE.fullscreen);
       }
 
