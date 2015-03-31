@@ -787,9 +787,11 @@ function thumbnailClickHandler(evt) {
   } else {
     LazyLoader.load('js/frame_scripts.js', function() {
       if (isPortrait || isPhone) {
-        //setView(LAYOUT_MODE.fullscreen);
+        showFileRemote(index);
+      } else {
+        setView(LAYOUT_MODE.fullscreen);
       }
-      showFileRemote(index);
+
     });
   }
 }
