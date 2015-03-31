@@ -67,8 +67,8 @@
       var oh = touch.height;
       var nw = this.screen.width;
       var nh = this.screen.height;
-      var nx = nw*ox/ow;
       var ny = nh*oy/oh;
+      var nx = ny;
       if (this.DEBUG) {
         this.logger2.innerHTML = 'x='+nx+',y='+ny;
       }
